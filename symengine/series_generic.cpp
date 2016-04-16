@@ -237,4 +237,34 @@ Expression UnivariateSeries::log(const Expression& c)
     return SymEngine::log(c.get_basic());
 }
 
+RCP<const MultivariatePolynomial> mult_series(RCP<const Basic> func, const map_sym_uint &&precs) {
+    set_sym vars;
+    umap_uvec_expr dict;
+    vec_uint v;
+    v.resize(precs.size(),0);
+    dict.insert(std::pair<vec_uint, Expression>(v,Expression(func)));
+    for( auto bucket : precs) {
+        vars.insert(bucket.first);
+    }
+    unsigned int whichvar = 0;
+    for (RCP<const Symbol> variable : vars) {
+        std::vector<std::pair<vec_uint,Expression>> temp;
+        for (auto &bucket : dict) {
+            RCP<const UnivariateSeries> s = UnivariateSeries::series(bucket.second.get_basic(), variable->get_name(), precs.find(variable)->second);
+            bucket.second = s->get_coeff(0);
+            for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
+                if (s->get_coeff(i) != zero) {
+                     vec_uint exps = bucket.first;
+                     exps[whichvar] = i;
+                     temp.push_back(std::pair<vec_uint, Expression>(exps,Expression(s->get_coeff(i))));
+                 }
+            }
+        }
+        for (auto term : temp)
+            dict.insert(term);
+        whichvar++;
+    }
+    return MultivariatePolynomial::from_dict(vars,std::move(dict));
+}
+
 } // SymEngine

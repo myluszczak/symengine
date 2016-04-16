@@ -75,5 +75,7 @@ inline RCP<const UnivariateSeries> univariate_series(RCP<const Symbol> i,
     return make_rcp<const UnivariateSeries>(std::move(s), i->get_name(), prec);
 }
 
+RCP<const MultivariatePolynomial> mult_series(RCP<const Basic> func, const map_sym_uint &&precs);
+
 }  // SymEngine
 #endif

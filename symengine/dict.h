@@ -203,6 +203,7 @@ public:
 typedef std::set< RCP<const Symbol>, RCPSymbolCompare> set_sym;
 typedef std::unordered_map<RCP<const Symbol>, unsigned int, RCPSymbolHash, RCPSymbolEq>
     umap_sym_uint;
+typedef std::map<RCP<const Symbol>, unsigned int, RCPSymbolCompare> map_sym_uint;
 typedef std::unordered_map<vec_uint, integer_class, vec_uint_hash, vec_uint_eq> umap_uvec_mpz;
 typedef std::unordered_map<vec_uint,Expression, vec_uint_hash, vec_uint_eq> umap_uvec_expr;
 
