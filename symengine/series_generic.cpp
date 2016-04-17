@@ -253,7 +253,7 @@ RCP<const MultivariatePolynomial> mult_series(RCP<const Basic> func, const map_s
             RCP<const UnivariateSeries> s = UnivariateSeries::series(bucket.second.get_basic(), variable->get_name(), precs.find(variable)->second);
             bucket.second = s->get_coeff(0);
             for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
-                if (s->get_coeff(i) != zero) {
+                if (!eq(*s->get_coeff(i), *zero)) {
                      vec_uint exps = bucket.first;
                      exps[whichvar] = i;
                      temp.push_back(std::pair<vec_uint, Expression>(exps,Expression(s->get_coeff(i))));
