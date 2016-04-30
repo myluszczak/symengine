@@ -29,6 +29,10 @@ using SymEngine::EulerGamma;
 using SymEngine::Number;
 using SymEngine::umap_int_basic;
 
+using SymEngine::MultivariateSeries;
+using SymEngine::MultivariateExprPolynomial;
+using SymEngine::MultivariatePolynomial;
+
 using namespace SymEngine::literals;
 
 TEST_CASE("Create UnivariateSeries", "[UnivariateSeries]")
@@ -217,20 +221,14 @@ TEST_CASE("UnivariateSeries: compare, as_basic, as_dict", "[UnivariateSeries]")
     REQUIRE(umap_eq(R->as_dict(), m) == true);
 }
 
-#define series_coeff(EX, SYM, PREC, COEFF)                                     \
-    UnivariateSeries::series(EX, SYM->get_name(), PREC)->get_coeff(COEFF)
-#define invseries_coeff(EX, SYM, PREC, COEFF)                                  \
-    UnivariateSeries::series_reverse(                                          \
-        UnivariateSeries::series(EX, SYM->get_name(), PREC)->get_poly(),       \
-        UnivariateExprPolynomial(SYM->get_name()), PREC)                       \
-        .find_cf(COEFF)                                                        \
-        .get_basic()
+#define series_coeff(EX, SYM, PREC, COEFF) MultivariateSeries::series(EX, SYM->get_name(), PREC)->get_coeff(COEFF)
+#define invseries_coeff(EX, SYM, PREC, COEFF) MultivariateSeries(MultivariateSeries::series_reverse(MultivariateSeries::series(EX, SYM->get_name(), PREC)->get_poly(), MultivariateExprPolynomial(SYM), PREC), SYM->get_name(), PREC).get_coeff(COEFF)
 
 static bool expand_check_pairs(const RCP<const Basic> &ex,
                                const RCP<const Symbol> &x, int prec,
                                const umap_short_basic &pairs)
 {
-    auto ser = SymEngine::UnivariateSeries::series(ex, x->get_name(), prec);
+    auto ser = SymEngine::MultivariateSeries::series(ex, x->get_name(), prec);
     for (auto it : pairs) {
         if (not it.second->__eq__(*(ser->get_coeff(it.first))))
             return false;

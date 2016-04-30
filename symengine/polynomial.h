@@ -734,6 +734,11 @@ public:
         return a * (1/b);
     }
 
+    MultivariateExprPolynomial operator/=(const Expression &b){
+        *this = *this / b;
+        return *this;
+    }
+
     MultivariateExprPolynomial &
     operator*=(const MultivariateExprPolynomial &other)
     {

@@ -259,7 +259,8 @@ bool MultivariateSeries::is_canonical(const MultivariateExprPolynomial p,
                                       const std::string var, const long degree,
                                       const unsigned int whichvar,
                                       const map_sym_uint precs)
-{
+{/*
+    // if the polynomial is a constant, don't worry about symbols.  Actually, don't worry about symbols at all.
     // check that p is a polynomial in terms of symbol(var)
     if (p.get_poly()->vars_.find(symbol(var)) == p.get_poly()->vars_.end())
         return false;
@@ -273,6 +274,10 @@ bool MultivariateSeries::is_canonical(const MultivariateExprPolynomial p,
     if (i != whichvar)
         return false;
 
+    // check that degree is equal to the precision for whichvar
+    if (precs.find(symbol(var))->second != degree_)
+        return false;
+    
     // check that the precision in precs define precisions for all of the
     // symbols of p and that these precisions are less than the degree of those
     // variables in p
@@ -282,11 +287,7 @@ bool MultivariateSeries::is_canonical(const MultivariateExprPolynomial p,
         if (precs.find(s)->second < p.get_poly()->degrees_.find(s)->second)
             return false;
     }
-
-    // check that degree is equal to the precision for whichvar
-    if (precs.find(symbol(var))->second != degree_)
-        return false;
-
+*/
     return true;
 }
 
