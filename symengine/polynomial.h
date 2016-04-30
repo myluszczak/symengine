@@ -400,20 +400,20 @@ public:
     // is represented as {(1,2):1,(4,5):3}
     set_sym vars_;
     umap_sym_uint degrees_;
-    umap_uvec_mpz dict_;
+    map_uvec_mpz dict_;
 
 public:
     IMPLEMENT_TYPEID(MULTIVARIATEINTPOLYNOMIAL)
     // constructor from components
     MultivariateIntPolynomial(const set_sym &var, umap_sym_uint &degrees,
-                              umap_uvec_mpz &dict);
+                              map_uvec_mpz &dict);
     // creates a MultivariateIntPolynomial in cannonical form based on
     // dictionary d.
     static RCP<const MultivariateIntPolynomial> from_dict(const set_sym &s,
-                                                          umap_uvec_mpz &&d);
+                                                          map_uvec_mpz &&d);
     vec_basic get_args() const;
     bool is_canonical(const set_sym &vars, const umap_sym_uint &degrees,
-                      const umap_uvec_mpz &dict);
+                      const map_uvec_mpz &dict);
     std::size_t __hash__() const;
     bool __eq__(const Basic &o) const;
     int compare(const Basic &o) const;

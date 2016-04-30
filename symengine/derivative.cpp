@@ -522,7 +522,7 @@ public:
                                  const RCP<const Symbol> &x)
     {
         if (self.vars_.find(x) != self.vars_.end()) {
-            umap_uvec_mpz dict;
+            map_uvec_mpz dict;
             auto i = self.vars_.begin();
             unsigned int index = 0;
             while (!(*i)->__eq__(*x)) {

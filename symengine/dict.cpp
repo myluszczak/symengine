@@ -211,37 +211,36 @@ long mpz_hash(const integer_class z)
     return mp_get_si(z);
 }
 
-int umap_uvec_mpz_compare(const umap_uvec_mpz &a, const umap_uvec_mpz &b)
+int map_uvec_mpz_compare(const map_uvec_mpz &a, const map_uvec_mpz &b)
 {
-    std::vector<vec_uint> va
-        = order_umap<vec_uint, umap_uvec_mpz, vec_uint_compare>(a);
-    std::vector<vec_uint> vb
-        = order_umap<vec_uint, umap_uvec_mpz, vec_uint_compare>(b);
-
-    for (unsigned int i = 0; i < va.size() && i < vb.size(); i++) {
-        if (vec_uint_compare()(va[i], vb[i])) {
+    auto pa = a.begin();
+    auto pb = b.begin();
+    for (unsigned int i = 0; i < a.size() && i < b.size(); i++) {
+        if (vec_uint_compare()(pa->first, pb->first)) {
             return -1;
-        } else if (!vec_uint_compare()(va[i], vb[i]) && va[i] != vb[i]) {
+        } else if (!vec_uint_compare()(pa->first, pb->first) && pa->first != pb->first) {
             return 1;
         } else {
-            if (a.find(va[i])->second != b.find(vb[i])->second) {
-                if (a.find(va[i])->second < b.find(vb[i])->second) {
+            if (pa->second != pb->second) {
+                if (pa->second < pb->second) {
                     return -1;
                 } else {
                     return 1;
                 }
             }
         }
+        pa++;
+        pb++;
     }
-    if (va.size() < vb.size())
+    if (a.size() < b.size())
         return -1;
-    if (vb.size() < va.size())
+    if (b.size() < a.size())
         return 1;
     return 0;
 }
 
 // Copied from umap_eq, with derefrencing of image in map removed.
-bool umap_uvec_mpz_eq(const umap_uvec_mpz &a, const umap_uvec_mpz &b)
+bool map_uvec_mpz_eq(const map_uvec_mpz &a, const map_uvec_mpz &b)
 {
     // This follows the same algorithm as Python's dictionary comparison
     // (a==b), which is implemented by "dict_equal" function in
