@@ -758,6 +758,38 @@ int MultivariateIntPolynomial::compare(const Basic &o) const
 integer_class MultivariateIntPolynomial::eval(
     std::map<RCP<const Symbol>, integer_class, RCPSymbolCompare> &vals) const
 {
+    // Horner's scheme for multivariable polynomials:
+    map_uvec_mpz temp = dict_;
+    auto var = vars_.end();
+    unsigned int whichvar = vars_.size();
+    //Preform Horner's scheme for each variable in turn
+    while (var != vars_.begin()) {
+        var--;
+        whichvar--;
+        auto iter = temp.begin();
+        vec_uint v;
+        v.resize(whichvar);
+        while (iter != temp.end()) {
+            for (unsigned int i = 0; i < whichvar ; i++) {
+                v[i] = iter->first[i];
+            }
+            auto stop = temp.upper_bound(v);
+            integer_class ans(0);
+            unsigned int last_exp = 0;
+            while (iter != stop) {
+                integer_class temp;
+                mp_pow_ui(temp, vals.find(*var)->second, iter->first[whichvar] - last_exp);
+                ans *= temp;
+                last_exp = iter->first[whichvar];
+                ans += iter->second;
+            }
+            temp.insert(std::pair<vec_uint, integer_class>(v,ans));
+        }
+        
+    }
+    return temp.begin()->second;
+    
+    /*
     integer_class ans(0);
     for (auto bucket : dict_) {
         integer_class term = bucket.second;
@@ -770,7 +802,7 @@ integer_class MultivariateIntPolynomial::eval(
         }
         ans += term;
     }
-    return ans;
+    return ans;*/
 }
 
 std::string MultivariateIntPolynomial::toString() const
