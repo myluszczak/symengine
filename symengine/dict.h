@@ -190,7 +190,7 @@ class vec_uint_compare
 public:
     bool operator()(const vec_uint &a, const vec_uint &b) const
     {
-        if (a.size() != b.size())
+        /*if (a.size() != b.size())
             return a.size() > b.size();
         unsigned int sum1 = 0;
         unsigned int sum2 = 0;
@@ -202,6 +202,7 @@ public:
         }
         if (sum1 != sum2)
             return sum1 > sum2;
+        return a > b;*/
         return a > b;
     }
 };
