@@ -775,21 +775,24 @@ integer_class MultivariateIntPolynomial::eval(
             }
             auto stop = temp.upper_bound(v);
             integer_class ans(0);
-            unsigned int last_exp = 0;
+            unsigned int last_exp = iter->first[whichvar];
             while (iter != stop) {
-                integer_class temp;
-                mp_pow_ui(temp, vals.find(*var)->second, iter->first[whichvar] - last_exp);
-                ans *= temp;
+                integer_class base;
+                mp_pow_ui(base, vals.find(*var)->second, last_exp - iter->first[whichvar]);
+                ans *= base;
                 last_exp = iter->first[whichvar];
                 ans += iter->second;
+		auto toErase = iter;
+		iter++;
+		temp.erase(toErase);
             }
             temp.insert(std::pair<vec_uint, integer_class>(v,ans));
         }
         
     }
     return temp.begin()->second;
-    
-    /*
+
+    /*    
     integer_class ans(0);
     for (auto bucket : dict_) {
         integer_class term = bucket.second;
