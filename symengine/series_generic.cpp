@@ -377,9 +377,9 @@ MultivariateSeries::mul(const MultivariateExprPolynomial &a,
             // empty variable sets, then they are both constant,
             // so prec gives no restriction, i.e. restrictor = 0.
             unsigned int restrictor = 0;
-            if (translator1.size() > 0) {
+            if (translator1.size() > 0 && target[translator1[0]] > 0) {
                 restrictor = target[translator1[0]];
-            } else if (translator2.size() > 0) {
+            } else if (translator2.size() > 0 && target[translator2[0]] > 0) {
                 restrictor = target[translator2[0]];
             }
             if (restrictor < prec) {
@@ -401,7 +401,18 @@ MultivariateExprPolynomial
 MultivariateSeries::pow(const MultivariateExprPolynomial &base, int exp,
                         unsigned prec)
 {
+    if (base.get_dict().size() == 1) {
+        vec_int v = base.get_dict().begin()->first;
+        for (unsigned int i = 0; i < v.size(); i++)
+            v[i] *= exp;
+        return MultivariateExprPolynomial(MultivariatePolynomial::from_dict(base.get_vars(), {{v,pow_ex(base.get_dict().begin()->second, exp)}}));
+    }
     if (exp < 0)
+        if (base.get_vars().empty()) {
+            if (base.get_dict().empty())
+               throw std::runtime_error("Error: Division by zero");
+            return MultivariateExprPolynomial(pow_ex(base.get_dict().begin()->second,exp));
+        } 
         return pow(MultivariateSeries::series_invert(
                        base,
                        MultivariateSeries::var(base.get_var()->get_name()),

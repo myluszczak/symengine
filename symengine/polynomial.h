@@ -753,16 +753,7 @@ public:
 
     bool operator==(const Expression &other) const
     {
-        if (poly_->dict_.size() > 1)
-            return false;
-        if (poly_->dict_.size() == 0) {
-            if (other == Expression(0)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return poly_->dict_.begin()->second == other;
+        return (*this == MultivariateExprPolynomial(other));
     }
 
     bool operator!=(const MultivariateExprPolynomial &other) const
