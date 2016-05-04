@@ -2,6 +2,7 @@
 #define SYMENGINE_POLYNOMIALS_MULTIVARIATE
 
 #include <symengine/expression.h>
+#include <symengine/polynomial.h>
 #include <symengine/monomials.h>
 
 namespace SymEngine
