@@ -407,7 +407,7 @@ MultivariateSeries::pow(const MultivariateExprPolynomial &base, int exp,
             v[i] *= exp;
         return MultivariateExprPolynomial(MultivariatePolynomial::from_dict(base.get_vars(), {{v,pow_ex(base.get_dict().begin()->second, exp)}}));
     }
-    if (exp < 0)
+    if (exp < 0) {
         if (base.get_vars().empty()) {
             if (base.get_dict().empty())
                throw std::runtime_error("Error: Division by zero");
@@ -418,6 +418,7 @@ MultivariateSeries::pow(const MultivariateExprPolynomial &base, int exp,
                        MultivariateSeries::var(base.get_var()->get_name()),
                        prec),
                    -exp, prec);
+    }
     if (exp == 0) {
         if (base == 0) {
             throw std::runtime_error("Error: 0**0 is undefined.");

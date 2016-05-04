@@ -222,7 +222,7 @@ TEST_CASE("UnivariateSeries: compare, as_basic, as_dict", "[UnivariateSeries]")
 }
 
 #define series_coeff(EX, SYM, PREC, COEFF) MultivariateSeries::series(EX, SYM->get_name(), PREC)->get_coeff(COEFF)
-#define invseries_coeff(EX, SYM, PREC, COEFF) MultivariateSeries(MultivariateSeries::series_reverse(MultivariateSeries::series(EX, SYM->get_name(), PREC)->get_poly(), MultivariateExprPolynomial(SYM), PREC), SYM->get_name(), PREC).get_coeff(COEFF)
+#define invseries_coeff(EX, SYM, PREC, COEFF) MultivariateSeries(MultivariateSeries::series_reverse(MultivariateSeries::series(EX, SYM->get_name(), PREC)->get_poly(), MultivariateSeries::var(SYM->get_name()), PREC), SYM->get_name(), PREC).get_coeff(COEFF)
 
 static bool expand_check_pairs(const RCP<const Basic> &ex,
                                const RCP<const Symbol> &x, int prec,

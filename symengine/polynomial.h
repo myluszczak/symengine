@@ -689,9 +689,7 @@ public:
 
     MultivariateExprPolynomial operator-() const
     {
-        MultivariateExprPolynomial retval(*this);
-        neg_mult_poly(*(retval.poly_.ptr()));
-        return retval;
+        return MultivariateExprPolynomial(neg_mult_poly(*poly_));
     }
 
     MultivariateExprPolynomial &
