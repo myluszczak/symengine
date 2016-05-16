@@ -574,7 +574,7 @@ RCP<const MultivariateSeries> mult_series2(RCP<const Basic> func,
                 precs.find(variable)->second);
             bucket.second = s->get_coeff(0);
             for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
-                if (s->get_coeff(i) != zero) {
+                if (!eq(*s->get_coeff(i), *zero)) {
                     vec_int exps = bucket.first;
                     exps[whichvar] = i;
                     temp.push_back(std::pair<vec_int, Expression>(
@@ -612,7 +612,7 @@ RCP<const MultivariateSeries> mult_series3(RCP<const Basic> func,
                 precs.find(variable)->second);
             bucket.second = s->get_coeff(0);
             for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
-                if (s->get_coeff(i) != zero) {
+                if (!eq(*s->get_coeff(i), *zero)) {
                     vec_int exps = bucket.first;
                     exps[whichvar] = i;
                     temp.push_back(std::pair<vec_int, Expression>(
