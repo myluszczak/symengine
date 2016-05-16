@@ -213,7 +213,8 @@ int map_sym_uint_compare(const map_sym_uint &A, const map_sym_uint &B)
     return 0;
 }
 
-bool map_sym_uint_eq(const map_sym_uint &A, const map_sym_uint &B){
+bool map_sym_uint_eq(const map_sym_uint &A, const map_sym_uint &B)
+{
     // Can't be equal if # of entries differ:
     if (A.size() != B.size())
         return false;

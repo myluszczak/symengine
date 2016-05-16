@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
                      .count()
               << "ms" << std::endl;
 
-
     auto arg = add(x, pow(x, integer(2)));
     auto ex = mul(sin(arg), cos(arg));
     std::cout << "Expanding: " << *ex << std::endl;

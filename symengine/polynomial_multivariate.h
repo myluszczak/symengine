@@ -8,7 +8,6 @@
 namespace SymEngine
 {
 
-
 class MultivariateIntPolynomial : public Basic
 {
 public:
@@ -389,7 +388,7 @@ public:
             auto var = poly_->vars_.begin();
             auto prec = precs.begin();
             unsigned int whichvar = 0;
-            while (var != poly_->vars_.end() && prec != precs.end()){
+            while (var != poly_->vars_.end() && prec != precs.end()) {
                 if ((*var)->__eq__(*prec->first)) {
                     if (bucket.first[whichvar] > (int)(prec->second))
                         accept = false;
@@ -399,9 +398,11 @@ public:
                 whichvar++;
             }
             if (accept)
-                d.insert(std::pair<vec_int, Expression>(bucket.first,bucket.second));
+                d.insert(std::pair<vec_int, Expression>(bucket.first,
+                                                        bucket.second));
         }
-        return MultivariateExprPolynomial(MultivariatePolynomial::from_dict(poly_->vars_, std::move(d)));
+        return MultivariateExprPolynomial(
+            MultivariatePolynomial::from_dict(poly_->vars_, std::move(d)));
     }
 
     const RCP<const MultivariatePolynomial> get_poly() const
@@ -430,7 +431,6 @@ public:
     }
 
 }; // MultivariateExprPolynomial
-
 
 } // SymEngine
 

@@ -128,7 +128,8 @@ bool MultivariateSeries::__eq__(const Basic &o) const
     // p_.vars_ and precs_
     return (is_a<MultivariateSeries>(o)
             and p_ == static_cast<const MultivariateSeries &>(o).p_
-            and map_sym_uint_eq(precs_, static_cast<const MultivariateSeries &>(o).precs_));
+            and map_sym_uint_eq(
+                    precs_, static_cast<const MultivariateSeries &>(o).precs_));
 }
 
 RCP<const Number> MultivariateSeries::add(const Number &other) const
@@ -499,6 +500,134 @@ Expression MultivariateSeries::exp(const Expression &c)
 Expression MultivariateSeries::log(const Expression &c)
 {
     return SymEngine::log(c.get_basic());
+}
+
+RCP<const MultivariateSeries> mult_series1(RCP<const Basic> func,
+                                           const map_sym_uint &&precs)
+{
+    set_sym vars;
+    umap_vec_expr dict;
+    map_basic_basic b;
+    RCP<const Integer> zero = make_rcp<Integer>(0);
+    for (auto bucket : precs) {
+        vars.insert(bucket.first);
+        b.insert(
+            std::pair<RCP<const Basic>, RCP<const Basic>>(bucket.first, zero));
+    }
+    vec_int v;
+    bool done = false;
+    RCP<const Basic> deriv = func->subs(b);
+    v.resize(precs.size(), 0);
+    while (!done) {
+        dict.insert(std::pair<vec_int, Expression>(v, Expression(deriv)));
+        auto iter = precs.begin();
+        unsigned int whichvar = 0;
+        v[whichvar]++;
+
+        // Handle rollover
+        while (iter != precs.end() && v[whichvar] > 0
+               && static_cast<unsigned int>(v[whichvar]) >= iter->second) {
+            v[whichvar] = 0;
+            iter++;
+            whichvar++;
+            if (iter != precs.end())
+                v[whichvar]++;
+        }
+        if (iter == precs.end()) {
+            done = true;
+
+            // Take the next derivative.
+        } else {
+            deriv = func;
+            whichvar = 0;
+            for (RCP<const Symbol> var : vars) {
+                for (int i = 0; i < v[whichvar]; i++)
+                    deriv = div(deriv->diff(var), make_rcp<Integer>(i + 1));
+                whichvar++;
+            }
+        }
+        deriv = deriv->subs(b);
+    }
+    return make_rcp<const MultivariateSeries>(
+        MultivariateExprPolynomial(
+            MultivariatePolynomial::from_dict(vars, std::move(dict))),
+        (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
+};
+
+RCP<const MultivariateSeries> mult_series2(RCP<const Basic> func,
+                                           const map_sym_uint &&precs)
+{
+    set_sym vars;
+    umap_vec_expr dict;
+    vec_int v;
+    v.resize(precs.size(), 0);
+    dict.insert(std::pair<vec_int, Expression>(v, Expression(func)));
+    for (auto bucket : precs) {
+        vars.insert(bucket.first);
+    }
+    unsigned int whichvar = 0;
+    for (RCP<const Symbol> variable : vars) {
+        std::vector<std::pair<vec_int, Expression>> temp;
+        for (auto &bucket : dict) {
+            RCP<const UnivariateSeries> s = UnivariateSeries::series(
+                bucket.second.get_basic(), variable->get_name(),
+                precs.find(variable)->second);
+            bucket.second = s->get_coeff(0);
+            for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
+                if (s->get_coeff(i) != zero) {
+                    vec_int exps = bucket.first;
+                    exps[whichvar] = i;
+                    temp.push_back(std::pair<vec_int, Expression>(
+                        exps, Expression(s->get_coeff(i))));
+                }
+            }
+        }
+        for (auto term : temp)
+            dict.insert(term);
+        whichvar++;
+    }
+    return make_rcp<const MultivariateSeries>(
+        MultivariateExprPolynomial(
+            MultivariatePolynomial::from_dict(vars, std::move(dict))),
+        (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
+}
+
+RCP<const MultivariateSeries> mult_series3(RCP<const Basic> func,
+                                           const map_sym_uint &&precs)
+{
+    set_sym vars;
+    umap_vec_expr dict;
+    vec_int v;
+    v.resize(precs.size(), 0);
+    dict.insert(std::pair<vec_int, Expression>(v, Expression(func)));
+    for (auto bucket : precs) {
+        vars.insert(bucket.first);
+    }
+    unsigned int whichvar = 0;
+    for (RCP<const Symbol> variable : vars) {
+        std::vector<std::pair<vec_int, Expression>> temp;
+        for (auto &bucket : dict) {
+            RCP<const MultivariateSeries> s = MultivariateSeries::series(
+                bucket.second.get_basic(), variable->get_name(),
+                precs.find(variable)->second);
+            bucket.second = s->get_coeff(0);
+            for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
+                if (s->get_coeff(i) != zero) {
+                    vec_int exps = bucket.first;
+                    exps[whichvar] = i;
+                    temp.push_back(std::pair<vec_int, Expression>(
+                        exps, Expression(s->get_coeff(i))));
+                }
+            }
+        }
+        for (auto term : temp)
+            dict.insert(term);
+        whichvar++;
+    }
+    return make_rcp<const MultivariateSeries>(
+        MultivariateExprPolynomial(
+            MultivariatePolynomial::from_dict(vars, std::move(dict))),
+        (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
 }
 
 } // SymEngine

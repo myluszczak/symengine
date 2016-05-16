@@ -71,7 +71,7 @@ bool umap_eq(const T &a, const T &b)
     if (a.size() != b.size())
         return false;
     // Loop over keys in "a":
-   for (const auto &p : a) {
+    for (const auto &p : a) {
         // O(1) lookup of the key in "b":
         auto f = b.find(p.first);
         if (f == b.end())

@@ -110,6 +110,18 @@ multivariate_series(RCP<const Symbol> i, unsigned int prec,
                                               prec);
 }
 
+// Calculate multivariable Taylor series expansions.
+
+// Use repeated differentiation
+RCP<const MultivariateSeries> mult_series1(RCP<const Basic> func,
+                                           const map_sym_uint &&precs);
+// Expand variable by variable using UnivariateSeries::series
+RCP<const MultivariateSeries> mult_series2(RCP<const Basic> func,
+                                           const map_sym_uint &&precs);
+// Expand variable by variable using MutlivariateSeries::series
+RCP<const MultivariateSeries> mult_series3(RCP<const Basic> func,
+                                           const map_sym_uint &&precs);
+
 } // SymEngine
 
 #endif

@@ -41,7 +41,6 @@ using SymEngine::map_sym_uint;
 
 using namespace SymEngine::literals;
 
-
 TEST_CASE("Constructing MultivariateIntPolynomial using from_dict",
           "[MultivariateIntPolynomial]")
 {
@@ -636,13 +635,12 @@ TEST_CASE("Testing derivative of MultivariatePolynomial",
                                                      {{0, 0}, expr3}});
 
     RCP<const MultivariatePolynomial> q1
-        = MultivariatePolynomial::from_dict({x, y},
-                                            {
-                                                {{1, 1}, expr1 * 2},
-                                                {{0, 2}, expr2},
-                                                {{1, 0}, expr3 * 2},
-                                                {{0, 0}, expr1},
-                                            });
+        = MultivariatePolynomial::from_dict({x, y}, {
+                                                        {{1, 1}, expr1 * 2},
+                                                        {{0, 2}, expr2},
+                                                        {{1, 0}, expr3 * 2},
+                                                        {{0, 0}, expr1},
+                                                    });
     RCP<const MultivariatePolynomial> q2
         = MultivariatePolynomial::from_dict({x, y}, {{{2, 0}, expr1},
                                                      {{1, 1}, expr2 * 2},
@@ -762,8 +760,7 @@ TEST_CASE("Testing addition, subtraction, multiplication of "
                  {{1, 1}, a},
                  {{1, 0}, (-1 * comp1) + negB},
                  {{0, 1}, negNum},
-                 {{0, 0}, comp4 * -1\
-}});
+                 {{0, 0}, comp4 * -1}});
     RCP<const MultivariatePolynomial> q3 = MultivariatePolynomial::from_dict(
         {x, y}, {{{3, 1}, 2 * comp1},
                  {{
@@ -1196,7 +1193,8 @@ TEST_CASE("Testing equality of MultivariateExprPolynomials with Expressions",
     REQUIRE(p2 == expr1);
 }
 
-TEST_CASE("Testing truncation of MultivariateExprPolynomial","[MultivariateExprPolynomial]")
+TEST_CASE("Testing truncation of MultivariateExprPolynomial",
+          "[MultivariateExprPolynomial]")
 {
     RCP<const Symbol> x = symbol("x");
     RCP<const Symbol> y = symbol("y");
@@ -1209,13 +1207,25 @@ TEST_CASE("Testing truncation of MultivariateExprPolynomial","[MultivariateExprP
     Expression expr2(sub(mul(two, a), b));
     Expression expr3(mul(a, c));
     Expression expr4(pow(b, a));
-    
-    map_sym_uint m = {{x,1}, {y,2}, {z,3}};
-    
-    MultivariateExprPolynomial p1(MultivariatePolynomial::from_dict({x,y,z}, {{{0,0,0}, expr1}, {{1,0,0}, expr2}, {{0,1,0}, expr3}, {{0,0,1}, expr4}, {{2,0,0}, expr1}, {{0,3,0}, expr2}, {{0,0,4}, expr3}, {{1,2,3}, expr4}} ));
-    
-    MultivariateExprPolynomial q1(MultivariatePolynomial::from_dict({x,y,z}, {{{0,0,0}, expr1}, {{1,0,0}, expr2}, {{0,1,0}, expr3}, {{0,0,1}, expr4}, {{1,2,3}, expr4}} ));
+
+    map_sym_uint m = {{x, 1}, {y, 2}, {z, 3}};
+
+    MultivariateExprPolynomial p1(
+        MultivariatePolynomial::from_dict({x, y, z}, {{{0, 0, 0}, expr1},
+                                                      {{1, 0, 0}, expr2},
+                                                      {{0, 1, 0}, expr3},
+                                                      {{0, 0, 1}, expr4},
+                                                      {{2, 0, 0}, expr1},
+                                                      {{0, 3, 0}, expr2},
+                                                      {{0, 0, 4}, expr3},
+                                                      {{1, 2, 3}, expr4}}));
+
+    MultivariateExprPolynomial q1(
+        MultivariatePolynomial::from_dict({x, y, z}, {{{0, 0, 0}, expr1},
+                                                      {{1, 0, 0}, expr2},
+                                                      {{0, 1, 0}, expr3},
+                                                      {{0, 0, 1}, expr4},
+                                                      {{1, 2, 3}, expr4}}));
 
     REQUIRE(q1 == p1.truncate(m));
-    
 }

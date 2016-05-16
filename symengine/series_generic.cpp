@@ -255,5 +255,4 @@ Expression UnivariateSeries::log(const Expression &c)
     return SymEngine::log(c.get_basic());
 }
 
-
 } // SymEngine
