@@ -384,22 +384,70 @@ RCP<const MultivariateIntPolynomial>
 mul_mult_poly(const MultivariateIntPolynomial &a,
               const MultivariateIntPolynomial &b)
 {
-    vec_uint v1;
-    vec_uint v2;
+    vec_uint translator1;
+    vec_uint translator2;
     set_sym s;
     umap_uvec_mpz dict;
-    unsigned int size = reconcile(v1, v2, s, a.vars_, b.vars_);
-    for (auto a_bucket : a.dict_) {
-        for (auto b_bucket : b.dict_) {
-            vec_uint target = uint_vec_translate_and_add(
-                a_bucket.first, b_bucket.first, v1, v2, size);
-            if (dict.find(target) == dict.end()) {
-                dict.insert(std::pair<vec_uint, integer_class>(
-                    target, a_bucket.second * b_bucket.second));
-            } else {
-                dict.find(target)->second += a_bucket.second * b_bucket.second;
-            }
+    unsigned int size = reconcile(translator1, translator2, s, a.vars_, b.vars_);
+    
+    vec_uint exps;
+    exps.resize(s.size());
+    vec_uint degs;
+    degs.resize(s.size());
+    unsigned int whichvar = 0;
+    // deg is one more than the maximum degree of the variable in the product
+    for (auto var : s) {
+        unsigned int deg = 1;
+        if (a.degrees_.find(var) != a.degrees_.end()) {
+            deg += a.degrees_.find(var)->second;
         }
+        if (b.degrees_.find(var) != b.degrees_.end()) {
+            deg += b.degrees_.find(var)->second;
+        }
+        degs[whichvar] = deg;
+        whichvar++;
+    }
+
+    // exps[whichvar] is then changed to the image of the variable
+    exps[0] = 1;
+    for (unsigned int i = 1; i < exps.size(); i++) {
+        exps[i] = exps[i-1] * degs[i-1]; 
+    }
+
+    map_uint_mpz a_dict;
+    map_uint_mpz b_dict;
+
+    // create the dictionaries of the image)
+    for (auto bucket : a.dict_) {
+        unsigned int image = 0;
+        for (unsigned int i = 0; i < a.vars_.size(); i++) {
+            image += exps[translator1[i]] * bucket.first[i];
+        }
+        a_dict.insert(std::pair<unsigned int, integer_class>(image, bucket.second));
+    }
+
+    for (auto bucket : b.dict_) {
+        unsigned int image = 0;
+        for (unsigned int i = 0; i < b.vars_.size(); i++) {
+            image += exps[translator2[i]] * bucket.first[i];
+        }
+        b_dict.insert(std::pair<unsigned int, integer_class>(image, bucket.second));
+    }
+
+    RCP<const UnivariateIntPolynomial> result = mul_poly(*UnivariateIntPolynomial::from_dict(*s.begin(), std::move(a_dict)), *UnivariateIntPolynomial::from_dict(*s.begin(), std::move(b_dict)));
+
+    // find the preimage of the product
+
+    for (auto bucket : result->get_dict()) {
+        vec_uint v;
+        v.resize(s.size());
+        unsigned int temp = bucket.first;
+        for (unsigned int i = 0; i < s.size() - 1; i++) {
+            v[i] = temp % degs[i];
+            temp /= degs[i];
+	}
+       v[s.size() - 1] = temp;
+       dict.insert(std::pair<vec_uint, integer_class>(v,bucket.second));
     }
     return MultivariateIntPolynomial::from_dict(s, std::move(dict));
 }
