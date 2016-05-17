@@ -38,6 +38,7 @@ using SymEngine::set_sym;
 using SymEngine::vec_uint;
 using SymEngine::vec_int;
 using SymEngine::map_sym_uint;
+using SymEngine::UnivariateExprPolynomial;
 
 using namespace SymEngine::literals;
 
@@ -910,9 +911,9 @@ TEST_CASE("Testing addition, subtraction, multiplication of "
     Expression expr6(mul(a, b));
     Expression expr7(div(a, b));
     RCP<const UnivariatePolynomial> p1
-        = univariate_polynomial(x, {{1, expr1}, {2, expr2}, {0, expr3}});
+        = univariate_polynomial(x, UnivariateExprPolynomial({{1, expr1}, {2, expr2}, {0, expr3}}));
     RCP<const UnivariatePolynomial> p2
-        = univariate_polynomial(x, {{0, expr4}, {1, expr1}});
+        = univariate_polynomial(x, UnivariateExprPolynomial({{0, expr4}, {1, expr1}}));
 
     RCP<const MultivariatePolynomial> q1 = MultivariatePolynomial::from_dict(
         {x}, {{{1}, 2 * expr1}, {{0}, expr4 + expr3}, {{2}, expr2}});
@@ -950,9 +951,9 @@ TEST_CASE("Testing addition, subtraction, multiplication of "
     Expression expr4(div(b, a));
     Expression expr5(add(b, c));
     RCP<const UnivariatePolynomial> p1
-        = univariate_polynomial(x, {{1, expr1}, {2, expr2}, {0, expr3}});
+        = univariate_polynomial(x, UnivariateExprPolynomial({{1, expr1}, {2, expr2}, {0, expr3}}));
     RCP<const UnivariatePolynomial> p2
-        = univariate_polynomial(y, {{0, expr4}, {1, expr5}});
+        = univariate_polynomial(y, UnivariateExprPolynomial({{0, expr4}, {1, expr5}}));
 
     RCP<const MultivariatePolynomial> q1
         = MultivariatePolynomial::from_dict({x, y}, {{{1, 0}, expr1},
@@ -1002,7 +1003,7 @@ TEST_CASE("Testing addition, subtraction, multiplication of "
     RCP<const MultivariatePolynomial> p1 = MultivariatePolynomial::from_dict(
         {x, y}, {{{1, 1}, a}, {{1, 0}, negB}, {{0, 0}, negNum}});
     RCP<const UnivariatePolynomial> p2 = univariate_polynomial(
-        y, {{0, comp4}, {1, Expression(integer(2))}, {2, comp1}});
+        y, UnivariateExprPolynomial({{0, comp4}, {1, Expression(integer(2))}, {2, comp1}}));
 
     RCP<const MultivariatePolynomial> q1
         = MultivariatePolynomial::from_dict({x, y}, {{{1, 1}, a},
@@ -1056,7 +1057,7 @@ TEST_CASE("Testing addition, subtraction, multiplication of "
     RCP<const MultivariatePolynomial> p1 = MultivariatePolynomial::from_dict(
         {x, y}, {{{1, 1}, a}, {{1, 0}, negB}, {{0, 0}, negNum}});
     RCP<const UnivariatePolynomial> p2 = univariate_polynomial(
-        z, {{0, comp4}, {1, Expression(integer(2))}, {2, comp1}});
+        z, UnivariateExprPolynomial({{0, comp4}, {1, Expression(integer(2))}, {2, comp1}}));
 
     RCP<const MultivariatePolynomial> q1 = MultivariatePolynomial::from_dict(
         {x, y, z}, {{{1, 1, 0}, a},

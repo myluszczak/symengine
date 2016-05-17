@@ -78,6 +78,7 @@ symengine/tests/basic/test_series_expansion_UP
 symengine/tests/basic/test_series_expansion_URatP
 symengine/tests/basic/test_polynomial_multivariate
 symengine/tests/basic/test_series_generic_multivariate
+symengine/tests/basic/test_series_expansion_URatF
 
 # Benchmarks executables
 benchmarks/add1
@@ -107,6 +108,7 @@ benchmarks/expand7_ginac
 benchmarks/series_expansion_sincos_piranha
 benchmarks/series_expansion_sinp
 benchmarks/series_expansion_sincos_MultivariateSeries
+benchmarks/series_expansion_sincos_flint
 
 #rubygem
 symengine/ruby/Gemfile.lock

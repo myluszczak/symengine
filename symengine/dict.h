@@ -50,6 +50,19 @@ typedef std::map<int, Expression> map_int_Expr;
 typedef std::map<RCP<const Symbol>, unsigned int, RCPSymbolCompare>
     map_sym_uint;
 
+//! Part of umap_vec_mpz:
+typedef struct {
+    inline std::size_t operator()(const vec_int &k) const
+    {
+        std::size_t h = 0;
+        for (const auto &p : k) {
+            h = (h << 4) + p;
+        }
+        return h;
+    }
+} vec_int_hash;
+typedef std::unordered_map<vec_int, integer_class, vec_int_hash> umap_vec_mpz;
+
 //! `insert(m, first, second)` is equivalent to `m[first] = second`, just
 //! faster,
 //! because no default constructor is called on the `second` type.
@@ -59,7 +72,8 @@ inline void insert(T1 &m, const T2 &first, const T3 &second)
     m.insert(std::pair<T2, T3>(first, second));
 }
 
-//! \return true if the two dictionaries `a` and `b` are equal. Otherwise false.
+//! eq function base
+//! \return true if the two dictionaries `a` and `b` are equal. Otherwise false
 template <class T>
 bool umap_eq(const T &a, const T &b)
 {
@@ -82,7 +96,6 @@ bool umap_eq(const T &a, const T &b)
     return true;
 }
 
-//! \return true if the two dictionaries `a` and `b` are equal. Otherwise false.
 template <class T>
 bool map_eq(const T &A, const T &B)
 {
@@ -101,18 +114,40 @@ bool map_eq(const T &A, const T &B)
     return true;
 }
 
-//! \return true if the two vectors `a` and `b` are equal. Otherwise false.
-bool vec_basic_eq(const vec_basic &a, const vec_basic &b);
-//! \return true if the two vectors `a` and `b` are equal up to a permutation.
-//! Otherwise false.
-bool vec_basic_eq_perm(const vec_basic &a, const vec_basic &b);
-//! \return true if the two dictionaries `a` and `b` are equal. Otherwise false.
-bool map_uint_mpz_eq(const map_uint_mpz &a, const map_uint_mpz &b);
-bool map_int_Expr_eq(const map_int_Expr &a, const map_int_Expr &b);
-//! \return true if the two multisets `a` and `b` are equal. Otherwise false.
-bool multiset_basic_eq(const multiset_basic &a, const multiset_basic &b);
+template <class T>
+bool vec_set_eq(const T &A, const T &B)
+{
+    // Can't be equal if # of entries differ:
+    if (A.size() != B.size())
+        return false;
+    // Loop over elements in "a" and "b":
+    auto a = A.begin();
+    auto b = B.begin();
+    for (; a != A.end(); ++a, ++b) {
+        if (neq(**a, **b))
+            return false; // values not equal
+    }
+    return true;
+}
 
+//! compare functions base (might also need umap_compare in the future)
 //! \return -1, 0, 1 for a < b, a == b, a > b
+template <class T>
+int vec_set_compare(const T &A, const T &B)
+{
+    if (A.size() != B.size())
+        return (A.size() < B.size()) ? -1 : 1;
+    auto a = A.begin();
+    auto b = B.begin();
+    int cmp;
+    for (; a != A.end(); ++a, ++b) {
+        cmp = (*a)->__cmp__(**b);
+        if (cmp != 0)
+            return cmp;
+    }
+    return 0;
+}
+
 template <class T>
 int map_compare(const T &A, const T &B)
 {
@@ -132,29 +167,21 @@ int map_compare(const T &A, const T &B)
     return 0;
 }
 
-//! \return -1, 0, 1 for a < b, a == b, a > b
+//! derived from bse functions
+bool vec_basic_eq(const vec_basic &a, const vec_basic &b);
+bool multiset_basic_eq(const multiset_basic &a, const multiset_basic &b);
+
 int vec_basic_compare(const vec_basic &a, const vec_basic &b);
-//! \return -1, 0, 1 for a < b, a == b, a > b
 int multiset_basic_compare(const multiset_basic &a, const multiset_basic &b);
-//! \return -1, 0, 1 for a < b, a == b, a > b
+
+//! map functions
 int map_uint_mpz_compare(const map_uint_mpz &a, const map_uint_mpz &b);
 int map_int_Expr_compare(const map_int_Expr &a, const map_int_Expr &b);
 int map_sym_uint_compare(const map_sym_uint &A, const map_sym_uint &b);
 bool map_sym_uint_eq(const map_sym_uint &a, const map_sym_uint &b);
 
-//! Part of umap_vec_mpz:
-typedef struct {
-    inline std::size_t operator()(const vec_int &k) const
-    {
-        std::size_t h = 0;
-        for (const auto &p : k) {
-            h = (h << 4) + p;
-        }
-        return h;
-    }
-} vec_int_hash;
-
-typedef std::unordered_map<vec_int, integer_class, vec_int_hash> umap_vec_mpz;
+//! misc functions
+bool vec_basic_eq_perm(const vec_basic &a, const vec_basic &b);
 
 int umap_vec_mpz_compare(const umap_vec_mpz &a, const umap_vec_mpz &b);
 long mpz_hash(const integer_class z);
@@ -320,6 +347,7 @@ int set_compare(const T &A, const T &B)
     return 0;
 }
 
+//! print functions
 std::ostream &operator<<(std::ostream &out, const SymEngine::umap_basic_num &d);
 std::ostream &operator<<(std::ostream &out, const SymEngine::map_basic_num &d);
 std::ostream &operator<<(std::ostream &out,
@@ -328,6 +356,7 @@ std::ostream &operator<<(std::ostream &out,
                          const SymEngine::umap_basic_basic &d);
 std::ostream &operator<<(std::ostream &out, const SymEngine::vec_basic &d);
 std::ostream &operator<<(std::ostream &out, const SymEngine::set_basic &d);
+std::ostream &operator<<(std::ostream &out, const SymEngine::map_int_Expr &d);
 
 } // SymEngine
 
