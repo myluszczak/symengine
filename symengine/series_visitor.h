@@ -66,7 +66,8 @@ public:
             } else if (sh == -1) {
                 p = Series::series_invert(p, var, prec);
             } else {
-                p = Series::series_invert(Series::pow(p, -sh, prec), var, prec);
+                // invert and then exponentinate to give correct behavior when expanding 1/x**(prec), which is to return a series with the term 1/x**(prec).
+                p = Series::pow(Series::series_invert(p,var,prec),-sh,prec);
             }
 
         } else if (is_a<Rational>(*exp)) {

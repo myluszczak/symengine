@@ -729,7 +729,7 @@ MultivariatePolynomial::from_dict(const set_sym &s, umap_vec_expr &&d)
     // remove terms with zero coefficients
     auto iter = d.begin();
     while (iter != d.end()) {
-        iter->second = expand(iter->second);
+        //iter->second = expand(iter->second);
         if (Expression(0) == iter->second) {
             auto toErase = iter;
             iter++;
