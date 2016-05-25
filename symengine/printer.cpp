@@ -462,7 +462,7 @@ void StrPrinter::bvisit(const NumberWrapper &x)
 {
     str_ = x.__str__();
 }
-
+/*
 void StrPrinter::bvisit(const MultivariateIntPolynomial &x)
 {
     std::ostringstream s;
@@ -559,7 +559,7 @@ void StrPrinter::bvisit(const MultivariatePolynomial &x)
         s << "0";
     str_ = s.str();
 }
-
+*/
 std::string StrPrinter::parenthesizeLT(const RCP<const Basic> &x,
                                        PrecedenceEnum precedenceEnum)
 {
