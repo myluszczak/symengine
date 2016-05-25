@@ -1,5 +1,5 @@
 /**
- *  \file series.h
+ *  file series.h
  *  Class for univariate series.
  *
  **/
@@ -265,7 +265,7 @@ public:
             res_p *= Series::pow(var, ldeg / n, prec);
         }
         if (do_inv)
-            return res_p * ctroot;
+            return res_p / ctroot;
         else
             return Series::series_invert(res_p, var, prec) * ctroot;
     }
@@ -402,7 +402,7 @@ public:
 
         // asin(s) = integrate(sqrt(1/(1-s**2))*diff(s))
         const Poly t(1 - Series::pow(s, 2, prec - 1));
-        const Poly res_p(Series::integrate(Series::mul(Series::diff(s, var), Series::series_invert(Series::series_nthroot(t, 2, var, prec - 1),var,prec-1), prec-1), var));
+        const Poly res_p(Series::integrate(Series::mul(Series::diff(s, var), Series::series_nthroot(t, -2, var, prec - 1), prec-1), var));
 
         if (c != 0) {
             return res_p + Series::asin(c);
