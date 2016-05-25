@@ -135,6 +135,8 @@ bool MultivariateIntPolynomial::__eq__(const Basic &o) const
                    .dict_.begin()
                    ->second)
             return false;
+	if (vars_ == static_cast<const MultivariateIntPolynomial &>(o).vars_ && dict_.begin()->first == static_cast<const MultivariateIntPolynomial &>(o).dict_.begin()->first)
+            return true;
         vec_uint v1;
         v1.resize(vars_.size(), 0);
         vec_uint v2;
@@ -831,23 +833,17 @@ std::size_t MultivariatePolynomial::__hash__() const
 bool MultivariatePolynomial::__eq__(const Basic &o) const
 {
     // compare constants without regard to vars
-    if (1 == dict_.size()
-        && 1 == static_cast<const MultivariatePolynomial &>(o).dict_.size()) {
-        if (dict_.begin()->second
-            != static_cast<const MultivariatePolynomial &>(o)
-                   .dict_.begin()
-                   ->second)
+    if (1 == dict_.size() && 1 == static_cast<const MultivariatePolynomial &>(o).dict_.size()) {
+        if (dict_.begin()->second != static_cast<const MultivariatePolynomial &>(o).dict_.begin()->second)
             return false;
+	if (vars_ == static_cast<const MultivariatePolynomial &>(o).vars_ && dict_.begin()->first == static_cast<const MultivariatePolynomial &>(o).dict_.begin()->first)
+            return true;
         vec_int v1;
         v1.resize(vars_.size(), 0);
         vec_int v2;
         v2.resize(static_cast<const MultivariatePolynomial &>(o).vars_.size(),
                   0);
-        if (dict_.begin()->first == v1
-            && static_cast<const MultivariatePolynomial &>(o)
-                       .dict_.begin()
-                       ->first
-                   == v2)
+        if ((dict_.begin()->first == v1 && static_cast<const MultivariatePolynomial &>(o).dict_.begin()->first == v2))
             return true;
         return false;
     } else if (dict_.size() == 0

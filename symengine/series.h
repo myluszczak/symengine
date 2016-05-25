@@ -402,10 +402,7 @@ public:
 
         // asin(s) = integrate(sqrt(1/(1-s**2))*diff(s))
         const Poly t(1 - Series::pow(s, 2, prec - 1));
-        const Poly res_p(Series::integrate(
-            Series::mul(Series::diff(s, var),
-                        Series::series_nthroot(t, -2, var, prec - 1), prec - 1),
-            var));
+        const Poly res_p(Series::integrate(Series::mul(Series::diff(s, var), Series::series_invert(Series::series_nthroot(t, 2, var, prec - 1),var,prec-1), prec-1), var));
 
         if (c != 0) {
             return res_p + Series::asin(c);
@@ -625,15 +622,14 @@ public:
         if (c != 0) {
             res_p -= c;
         }
+	Poly s_(res_p);
         auto steps = step_list(prec);
         for (const auto step : steps) {
-            const Poly p(s - Series::series_atanh(res_p, var, step));
+            const Poly p(s_ - Series::series_atanh(res_p, var, step));
             res_p += Series::mul(-p, Series::pow(res_p, 2, step) - 1, step);
         }
         if (c != 0) {
-            return (res_p + Series::tanh(c))
-                   * Series::series_invert(1 + Series::tanh(c) * res_p, var,
-                                           prec);
+            return Series::mul( (res_p + Series::tanh(c)), Series::series_invert(1 + Series::tanh(c) * res_p, var, prec),prec);
         } else {
             return res_p;
         }

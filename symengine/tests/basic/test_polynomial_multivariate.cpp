@@ -526,13 +526,13 @@ TEST_CASE("Testing MultivariatePolynomial::__eq__(), __hash__, and compare",
     Expression sum(add(i, j));
     Expression difference(sub(mul(two, i), j));
     RCP<const MultivariatePolynomial> p1 = MultivariatePolynomial::from_dict(
-        {x, y}, {{{2, 0}, sum}, {{1, 1}, difference}, {{0, 2}, sum}});
+        {x, y}, {{{2, 0}, sum}, {{1, 1}, Expression(a)}, {{0, 2}, sum}});
     RCP<const MultivariatePolynomial> p2 = MultivariatePolynomial::from_dict(
-        {x, y}, {{{2, 0}, sum}, {{1, 1}, difference * -1}, {{0, 2}, sum}});
+        {x, y}, {{{2, 0}, sum}, {{1, 1}, Expression(a) * -1}, {{0, 2}, sum}});
     RCP<const MultivariatePolynomial> p3 = MultivariatePolynomial::from_dict(
-        {x, y}, {{{2, 0}, sum * 2}, {{0, 2}, sum * 2}});
+        {x, y}, {{{2, 0}, sum + sum }, {{0, 2}, sum + sum}});
     RCP<const MultivariatePolynomial> p4 = MultivariatePolynomial::from_dict(
-        {a, b}, {{{2, 0}, sum * 2}, {{0, 2}, sum * 2}});
+        {a, b}, {{{2, 0}, sum + sum}, {{0, 2}, sum + sum}});
     set_sym s;
     vec_int v;
     RCP<const MultivariatePolynomial> p5
