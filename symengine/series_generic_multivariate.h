@@ -115,6 +115,51 @@ multivariate_series(RCP<const Symbol> i, unsigned int prec,
 // Use repeated differentiation
 RCP<const MultivariateSeries> mult_series1(RCP<const Basic> func,
                                            const map_sym_uint &&precs);
+
+template <typename Series>
+RCP<const MultivariateSeries> mult_series(RCP<const Basic> func, const map_sym_uint && precs)
+{
+    set_sym vars;
+    umap_vec_expr dict;
+    vec_int v;
+    v.resize(precs.size(), 0);
+    dict.insert(std::pair<vec_int, Expression>(v, Expression(func)));
+    for (auto bucket : precs) {
+        vars.insert(bucket.first);
+    }
+    unsigned int whichvar = 0;
+    for (RCP<const Symbol> variable : vars) {
+        std::vector<std::pair<vec_int, Expression>> temp;
+        for (auto &bucket : dict) {
+            RCP<const Series> s = Series::series(
+                bucket.second.get_basic(), variable->get_name(),
+                precs.find(variable)->second);
+            bucket.second = s->get_coeff(0);
+            for (int i = Series::ldegree(s->get_poly()); i < 0 ||  static_cast<unsigned int>(i) < precs.find(variable)->second; i++) {
+                if (i != 0 && !eq(*s->get_coeff(i), *zero)) {
+                    vec_int exps = bucket.first;
+                    exps[whichvar] = i;
+                    temp.push_back(std::pair<vec_int, Expression>(
+                        exps, Expression(s->get_coeff(i))));
+                }
+            }
+        }
+        for (auto term : temp)
+            dict.insert(term);
+        whichvar++;
+    }
+
+    umap_vec_expr dict2;
+    for (auto bucket : dict) {
+        dict2.insert(std::pair<vec_int, Expression>(bucket.first, expand(bucket.second)));
+    }
+    return make_rcp<const MultivariateSeries>(
+        MultivariateExprPolynomial(
+            MultivariatePolynomial::from_dict(vars, std::move(dict2))),
+        (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
+
+}
+
 // Expand variable by variable using UnivariateSeries::series
 RCP<const MultivariateSeries> mult_series2(RCP<const Basic> func,
                                            const map_sym_uint &&precs);
