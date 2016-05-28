@@ -346,18 +346,8 @@ public:
                                      prec);
     }
 
-    static inline Poly series_sin(const Poly &s, const Poly &var,
-                                  unsigned int prec)
-    {
-        const Coeff c(Series::find_cf(s, var, 0));
-
-        if (c != 0) {
-            const Poly t = s - c;
-            return Series::sin(c) * Series::series_cos(t, var, prec)
-                   + Series::cos(c) * Series::series_sin(t, var, prec);
-        }
-        //! fast sin(x)
-        Poly res_p(0), monom(s);
+    static inline Poly res_sin(const Poly &s, unsigned int prec){
+                Poly res_p(0), monom(s);
         Poly ssquare = Series::mul(s, s, prec);
         Coeff prod(1);
         for (unsigned int i = 0; i < prec / 2; i++) {
@@ -369,6 +359,18 @@ public:
             monom = Series::mul(monom, ssquare, prec);
         }
         return res_p;
+    }
+
+    static inline Poly series_sin(const Poly &s, const Poly &var,
+                                  unsigned int prec)
+    {
+        const Coeff c(Series::find_cf(s, var, 0));
+        if(c != 0) {
+            const Poly t = s - c;
+            return Series::cos(c) * res_sin(t,prec) + Series::sin(c) * res_cos(t,prec); 
+        } else {
+            return res_sin(s,prec);
+        }
 
         //        if (c == 0) {
         //            // return 2*t/(1+t**2)
@@ -418,15 +420,7 @@ public:
         return Series::acos(c) - series_asin(s - c, var, prec);
     }
 
-    static inline Poly series_cos(const Poly &s, const Poly &var,
-                                  unsigned int prec)
-    {
-        const Coeff c(Series::find_cf(s, var, 0));
-        if (c != 0) {
-            const Poly t = s - c;
-            return Series::cos(c) * Series::series_cos(t, var, prec)
-                   - Series::sin(c) * Series::series_sin(t, var, prec);
-        }
+    static inline Poly res_cos(const Poly &s, unsigned int prec){
         Poly res_p(1);
         Poly ssquare = Series::mul(s, s, prec);
         Poly monom(ssquare);
@@ -440,6 +434,18 @@ public:
             monom = Series::mul(monom, ssquare, prec);
         }
         return res_p;
+    }
+
+    static inline Poly series_cos(const Poly &s, const Poly &var,
+                                  unsigned int prec)
+    {
+        const Coeff c(Series::find_cf(s, var, 0));
+        if (c != 0) {
+            const Poly t = s - c;
+            return Series::cos(c) * res_cos(t, prec) - Series::sin(c) * res_sin(t,  prec);
+        } else {
+            return res_cos(s,prec);
+        }
         //
         //        if (c == 0) {
         //            // return (1-t**2)/(1+t**2)

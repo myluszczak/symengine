@@ -548,9 +548,13 @@ RCP<const MultivariateSeries> mult_series1(RCP<const Basic> func,
         }
         deriv = deriv->subs(b);
     }
+    umap_vec_expr dict2;
+    for (auto bucket : dict) {
+        dict2.insert(std::pair<vec_int, Expression>(bucket.first, expand(bucket.second)));
+    }
     return make_rcp<const MultivariateSeries>(
         MultivariateExprPolynomial(
-            MultivariatePolynomial::from_dict(vars, std::move(dict))),
+            MultivariatePolynomial::from_dict(vars, std::move(dict2))),
         (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
 };
 
@@ -573,8 +577,8 @@ RCP<const MultivariateSeries> mult_series2(RCP<const Basic> func,
                 bucket.second.get_basic(), variable->get_name(),
                 precs.find(variable)->second);
             bucket.second = s->get_coeff(0);
-            for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
-                if (!eq(*s->get_coeff(i), *zero)) {
+            for (int i = UnivariateSeries::ldegree(s->get_poly()); i < 0 ||  static_cast<unsigned int>(i) < precs.find(variable)->second; i++) {
+                if (i != 0 && !eq(*s->get_coeff(i), *zero)) {
                     vec_int exps = bucket.first;
                     exps[whichvar] = i;
                     temp.push_back(std::pair<vec_int, Expression>(
@@ -586,9 +590,14 @@ RCP<const MultivariateSeries> mult_series2(RCP<const Basic> func,
             dict.insert(term);
         whichvar++;
     }
+
+    umap_vec_expr dict2;
+    for (auto bucket : dict) {
+        dict2.insert(std::pair<vec_int, Expression>(bucket.first, expand(bucket.second)));
+    }
     return make_rcp<const MultivariateSeries>(
         MultivariateExprPolynomial(
-            MultivariatePolynomial::from_dict(vars, std::move(dict))),
+            MultivariatePolynomial::from_dict(vars, std::move(dict2))),
         (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
 }
 
@@ -607,12 +616,14 @@ RCP<const MultivariateSeries> mult_series3(RCP<const Basic> func,
     for (RCP<const Symbol> variable : vars) {
         std::vector<std::pair<vec_int, Expression>> temp;
         for (auto &bucket : dict) {
+	    //std::cout << "expanding: " << bucket.second.get_basic()->__str__() << std::endl;
             RCP<const MultivariateSeries> s = MultivariateSeries::series(
                 bucket.second.get_basic(), variable->get_name(),
                 precs.find(variable)->second);
             bucket.second = s->get_coeff(0);
-            for (unsigned int i = 1; i < precs.find(variable)->second; i++) {
-                if (!eq(*s->get_coeff(i), *zero)) {
+            //std::cout << s->__str__() << std::endl << std::endl;
+            for (int i = MultivariateSeries::ldegree(s->get_poly()); i < 0 || static_cast<unsigned int>(i) < precs.find(variable)->second; i++) {
+                if (i != 0 && !eq(*s->get_coeff(i), *zero)) {
                     vec_int exps = bucket.first;
                     exps[whichvar] = i;
                     temp.push_back(std::pair<vec_int, Expression>(
@@ -624,9 +635,13 @@ RCP<const MultivariateSeries> mult_series3(RCP<const Basic> func,
             dict.insert(term);
         whichvar++;
     }
+    umap_vec_expr dict2;
+    for (auto bucket : dict) {
+        dict2.insert(std::pair<vec_int, Expression>(bucket.first, expand(bucket.second)));
+    }
     return make_rcp<const MultivariateSeries>(
         MultivariateExprPolynomial(
-            MultivariatePolynomial::from_dict(vars, std::move(dict))),
+            MultivariatePolynomial::from_dict(vars, std::move(dict2))),
         (*vars.begin())->get_name(), precs.begin()->second, std::move(precs));
 }
 
